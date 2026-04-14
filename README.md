@@ -12,6 +12,7 @@ This chatbot tries to solve both problems at once:
 
 - Answer common accommodation questions accurately using a RAG (Retrieval-Augmented Generation) pipeline built on real HAMK accommodation data
 - Fall back to live web search (DuckDuckGo) when the knowledge base does not have a confident answer
+- Answer arrival questions with real-time weather and train schedules pulled directly from open APIs
 - Detect and block GDPR Article 9 sensitive queries before they ever reach the LLM, redirecting the user to a human contact instead
 
 Everything runs locally — no cloud APIs, no data leaving the machine.
@@ -45,7 +46,8 @@ Here is roughly how the session went:
 | 7 | Run the app and debug a false positive | Diagnosed that general queries were being flagged as sensitive — traced it to 3 bugs (wrong model name, substring keyword matching, vague LLM prompt) and fixed all three |
 | 8 | Add web search fallback + MCP server | Added DuckDuckGo fallback when RAG confidence is low, live intent detection, housing vs non-housing routing, and a FastMCP server so Claude Code can call the same search tools |
 | 9 | Debug and fix two response quality bugs | Fixed sauna query (model was ignoring KB and returning apartment listings) and bus timetable query (model hallucinated a HOPS answer instead of using general web search) |
-| 10 | Write test cases and this README | Documented 13 test cases from screenshots, updated README |
+| 10 | Add weather + transport MCP tools | Added Open-Meteo weather and VR Digitraffic train schedule tools — both free with no API key. Registered in the same MCP server so Claude Code and the chatbot both benefit |
+| 11 | Write test cases and this README | Documented 13 test cases from screenshots, updated README |
 
 Each step was a short natural-language instruction. Claude Code handled file creation, web fetching, git commits, debugging, and even process management (finding and killing stale Flask processes when multiple instances piled up).
 
@@ -91,6 +93,21 @@ User message
   Flask response → Chat UI
 ```
 
+### MCP server — `hamk-search`
+
+The project includes a [Model Context Protocol](https://modelcontextprotocol.io) server registered in `.mcp.json`. This lets Claude Code call the same tools the chatbot uses — useful for development, testing, and exploring live data directly from the editor.
+
+| Tool | API used | Key required | What it does |
+|---|---|---|---|
+| `web_search(query)` | DuckDuckGo (`ddgs`) | No | General web search — used as fallback when RAG confidence is low |
+| `search_finnish_housing(location)` | DuckDuckGo with `site:` filters | No | Searches Vuokraovi, Oikotie, and HOPS for rental listings in a Finnish city |
+| `get_campus_weather(campus_name)` | [Open-Meteo](https://open-meteo.com) | No | Current conditions + 3-day forecast for any HAMK campus |
+| `get_train_schedule(origin, destination)` | [VR Digitraffic](https://www.digitraffic.fi/rautatieliikenne/) | No | Live train departures between Finnish cities |
+
+All four tools are free and require no API key or account — important for a student learning project. Open-Meteo and Digitraffic are open public APIs maintained by meteorological and transport authorities respectively.
+
+The same functions are also called by the Flask chatbot directly — the MCP server wraps the shared logic without duplicating it.
+
 ### Tech stack
 
 | Layer | Technology |
@@ -100,6 +117,8 @@ User message
 | Vector store | ChromaDB (persisted to `./chroma_db`) |
 | Privacy classification | Keyword regex + Ollama LLM |
 | Web search | DuckDuckGo via `ddgs` |
+| Weather | Open-Meteo API (free, no key) |
+| Train schedules | VR Digitraffic API (free, no key) |
 | MCP server | FastMCP (stdio transport) |
 | Frontend | Plain HTML/CSS/JS (single page, served by Flask) |
 | Knowledge base | Custom `.txt` file based on `hamk.fi` accommodation content |
@@ -118,6 +137,9 @@ accommodation-chatbot/
 │   ├── ingest.py                 # Chunk, embed, and store docs in ChromaDB
 │   ├── query.py                  # Retrieve top-3 chunks + confidence score
 │   ├── web_search.py             # DuckDuckGo search (general + Finnish housing)
+│   ├── campus_data.py            # Campus coordinates, station codes, bus notes
+│   ├── weather.py                # Open-Meteo weather per campus
+│   ├── transport.py              # VR Digitraffic live train schedules
 │   └── data/
 │       └── hamk_accommodation.txt  # HAMK accommodation knowledge base
 ├── privacy_layer/
@@ -126,7 +148,7 @@ accommodation-chatbot/
 ├── llm/
 │   └── ollama_client.py          # Ollama API wrapper
 ├── mcp_server/
-│   └── search_server.py          # FastMCP server exposing web_search + search_finnish_housing
+│   └── search_server.py          # FastMCP server — 4 tools: web search, housing search, weather, trains
 ├── templates/
 │   └── index.html                # Chat UI
 ├── test_cases/
@@ -201,6 +223,17 @@ A single web search function is not enough. Finnish housing queries need site-sp
 
 **Live intent is a separate signal from RAG confidence.**
 A query like "Can you search Vuokraovi for me?" has *low* RAG distance (the KB mentions Vuokraovi) but the user clearly wants live data, not a static description. Live intent keywords ("find me", "can you search", "available now") must be detected independently of distance scoring.
+
+### On MCP (Model Context Protocol)
+
+**MCP turns your own tools into agent tools.**
+The same Python functions that power the Flask chatbot are exposed as MCP tools so Claude Code can call them directly during development. There is no duplication — the MCP server imports from the shared `knowledge_base/` modules. This means testing a search or a weather query is one tool call in the editor, not a separate curl command or test script.
+
+**Free public APIs are a good starting point.**
+Open-Meteo (weather) and VR Digitraffic (trains) both work with zero credentials. For a learning project or a student demo, starting with zero-credential APIs removes a whole category of setup friction and keeps the project reproducible on any machine.
+
+**MCP and the app share the same data layer.**
+Because both the MCP server and the Flask app import from the same `knowledge_base/` modules, any improvement to the underlying function — better formatting, a new campus, a bug fix — immediately benefits both. The MCP server is a thin wrapper, not a separate implementation.
 
 ### On using a thesis topic as a learning project
 
