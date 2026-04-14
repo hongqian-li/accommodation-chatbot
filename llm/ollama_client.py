@@ -15,7 +15,9 @@ OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 SYSTEM_PROMPT = """You are a helpful assistant for HAMK University of Applied Sciences
-student accommodation queries. Answer only using the provided context.
+student accommodation queries. Answer using the provided context below.
+If the context includes a WEB SEARCH RESULTS section, summarise those results
+directly — include the listing counts, URLs, and any specific details shown.
 If the answer is not in the context, say you don't have that information and
 suggest the student contact arrival@hamk.fi for further help.
 Be concise, friendly, and factual. Do not ask for or repeat any personal information."""
@@ -27,7 +29,9 @@ def generate_answer(query: str, context: str) -> str:
 
     Args:
         query:   The student's question.
-        context: Relevant text chunks retrieved from ChromaDB.
+        context: RAG chunks from ChromaDB, optionally followed by a
+                 'WEB SEARCH RESULTS' section when the query needed
+                 live data.
 
     Returns:
         The model's answer as a plain string.
@@ -36,9 +40,16 @@ def generate_answer(query: str, context: str) -> str:
         requests.exceptions.ConnectionError: If Ollama is not running.
         requests.exceptions.HTTPError: If the Ollama API returns an error.
     """
+    has_web = "===WEB SEARCH RESULTS" in context
+    web_instruction = (
+        "\nIMPORTANT: The context contains live WEB SEARCH RESULTS. "
+        "Use them to answer — include listing counts and direct URLs where available.\n"
+        if has_web else ""
+    )
     prompt = (
         f"{SYSTEM_PROMPT}\n\n"
         f"Context:\n{context}\n\n"
+        f"{web_instruction}"
         f"Student question: {query}\n\n"
         f"Answer:"
     )

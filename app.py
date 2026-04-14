@@ -102,7 +102,12 @@ def chat():
             # Try Finnish housing sites first; fall back to general web search
             web_results = search_finnish_housing(message) or web_search(message)
             if web_results:
-                context = context + "\n\n---\n\nWEB SEARCH RESULTS:\n" + web_results
+                context = (
+                    context
+                    + "\n\n===WEB SEARCH RESULTS (live, use these to answer)===\n"
+                    + web_results
+                    + "\n===END WEB SEARCH RESULTS==="
+                )
                 web_used = True
         answer = generate_answer(message, context)
     except Exception as e:
