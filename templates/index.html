@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HAMK Accommodation Assistant</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .chat-wrapper {
+      width: 100%;
+      max-width: 720px;
+      height: 100vh;
+      max-height: 860px;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    /* Header */
+    .chat-header {
+      background: #002f6c;
+      color: #fff;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chat-header .avatar {
+      width: 40px; height: 40px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .chat-header .title { font-size: 1.05rem; font-weight: 600; }
+    .chat-header .subtitle { font-size: 0.78rem; opacity: 0.75; margin-top: 2px; }
+    .status-dot {
+      width: 8px; height: 8px;
+      background: #4ade80;
+      border-radius: 50%;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* Messages */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+    }
+    .message.user { align-self: flex-end; align-items: flex-end; }
+    .message.bot  { align-self: flex-start; align-items: flex-start; }
+
+    .bubble {
+      padding: 11px 16px;
+      border-radius: 16px;
+      line-height: 1.55;
+      font-size: 0.92rem;
+    }
+    .message.user .bubble {
+      background: #002f6c;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .message.bot .bubble {
+      background: #f1f3f5;
+      color: #1a1a2e;
+      border-bottom-left-radius: 4px;
+    }
+    .message.bot.sensitive .bubble {
+      background: #fff3cd;
+      border-left: 3px solid #f59e0b;
+    }
+
+    .meta {
+      font-size: 0.7rem;
+      color: #9ca3af;
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+
+    /* Typing indicator */
+    .typing .bubble {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 14px 18px;
+    }
+    .dot {
+      width: 7px; height: 7px;
+      background: #9ca3af;
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40%           { transform: translateY(-6px); }
+    }
+
+    /* Input area */
+    .chat-input-area {
+      border-top: 1px solid #e5e7eb;
+      padding: 16px 20px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      background: #fff;
+    }
+    .chat-input-area textarea {
+      flex: 1;
+      resize: none;
+      border: 1.5px solid #d1d5db;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      line-height: 1.5;
+      max-height: 120px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input-area textarea:focus { border-color: #002f6c; }
+    .send-btn {
+      background: #002f6c;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      width: 44px; height: 44px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .send-btn:hover  { background: #004299; }
+    .send-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+    .send-btn svg { width: 20px; height: 20px; }
+
+    /* Privacy notice */
+    .privacy-notice {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #9ca3af;
+      padding: 6px 20px 12px;
+    }
+    .privacy-notice a { color: #6b7280; }
+  </style>
+</head>
+<body>
+<div class="chat-wrapper">
+
+  <div class="chat-header">
+    <div class="avatar">&#127968;</div>
+    <div>
+      <div class="title">HAMK Accommodation Assistant</div>
+      <div class="subtitle">Ask me about rooms, prices, and applications</div>
+    </div>
+    <div class="status-dot" title="Online"></div>
+  </div>
+
+  <div class="chat-messages" id="messages">
+    <div class="message bot">
+      <div class="bubble">
+        Hi! I can help you with questions about HAMK student accommodation —
+        room types, prices, application process, and campus locations.
+        How can I help you today?
+      </div>
+      <div class="meta">HAMK Assistant</div>
+    </div>
+  </div>
+
+  <div class="chat-input-area">
+    <textarea
+      id="userInput"
+      placeholder="Ask about rooms, prices, or how to apply..."
+      rows="1"
+    ></textarea>
+    <button class="send-btn" id="sendBtn" title="Send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+
+  <div class="privacy-notice">
+    Personal &amp; sensitive information is never processed by this assistant.
+    For private matters contact
+    <a href="mailto:arrival@hamk.fi">arrival@hamk.fi</a>.
+  </div>
+
+</div>
+
+<script>
+  const messagesEl = document.getElementById("messages");
+  const inputEl    = document.getElementById("userInput");
+  const sendBtn    = document.getElementById("sendBtn");
+
+  function scrollToBottom() {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function addMessage(html, role, isSensitive = false) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "message " + role + (isSensitive ? " sensitive" : "");
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.innerHTML = html;
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const now = new Date();
+    meta.textContent = role === "user"
+      ? "You · " + now.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})
+      : "HAMK Assistant · " + now.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
+
+    wrapper.appendChild(bubble);
+    wrapper.appendChild(meta);
+    messagesEl.appendChild(wrapper);
+    scrollToBottom();
+    return wrapper;
+  }
+
+  function addTypingIndicator() {
+    const wrapper = document.createElement("div");
+    wrapper.className = "message bot typing";
+    wrapper.id = "typing";
+    wrapper.innerHTML = `<div class="bubble">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>`;
+    messagesEl.appendChild(wrapper);
+    scrollToBottom();
+  }
+
+  function removeTypingIndicator() {
+    const el = document.getElementById("typing");
+    if (el) el.remove();
+  }
+
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    inputEl.value = "";
+    inputEl.style.height = "auto";
+    sendBtn.disabled = true;
+
+    addMessage(escapeHtml(text), "user");
+    addTypingIndicator();
+
+    try {
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+      removeTypingIndicator();
+      const replyHtml = data.reply || "Sorry, I could not get a response.";
+      addMessage(replyHtml, "bot", data.sensitive === true);
+    } catch (err) {
+      removeTypingIndicator();
+      addMessage("Connection error. Please try again.", "bot");
+    } finally {
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+  }
+
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  // Auto-resize textarea
+  inputEl.addEventListener("input", () => {
+    inputEl.style.height = "auto";
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + "px";
+  });
+
+  // Send on Enter (Shift+Enter for newline)
+  inputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  sendBtn.addEventListener("click", sendMessage);
+</script>
+</body>
+</html>
