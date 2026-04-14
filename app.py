@@ -24,6 +24,23 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# Words that signal the user wants live/current data rather than static KB info.
+# When any of these appear in the message, web search is forced regardless of
+# the RAG distance score (e.g. "search vuokraovi for me" scores well in RAG
+# because the KB mentions the platform, but the user clearly wants live results).
+LIVE_INTENT_KEYWORDS = [
+    "search for me", "find me", "show me", "look up", "look for",
+    "can you search", "can you find", "search apartments", "search listings",
+    "current listings", "available now", "available today", "right now",
+    "latest", "new listings", "recently listed", "this week",
+]
+
+
+def _has_live_intent(message: str) -> bool:
+    """Return True if the message signals intent for live/current data."""
+    msg = message.lower()
+    return any(kw in msg for kw in LIVE_INTENT_KEYWORDS)
+
 SENSITIVE_RESPONSE = (
     "Your question seems to involve personal or sensitive information. "
     "For privacy reasons, I'm not able to process that here. "
@@ -81,7 +98,7 @@ def chat():
     web_used = False
     try:
         context, needs_web = get_context_with_confidence(message)
-        if needs_web:
+        if needs_web or _has_live_intent(message):
             # Try Finnish housing sites first; fall back to general web search
             web_results = search_finnish_housing(message) or web_search(message)
             if web_results:
