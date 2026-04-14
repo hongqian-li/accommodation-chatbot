@@ -1,0 +1,290 @@
+==========================================================
+HAMK UNIVERSITY OF APPLIED SCIENCES
+STUDENT ACCOMMODATION KNOWLEDGE BASE
+Source: hamk.fi/en/student-pages/accommodation/
+Last updated: April 2026 (simulated for RAG purposes)
+==========================================================
+
+----------------------------------------------------------
+SECTION 1: GENERAL INFORMATION
+----------------------------------------------------------
+
+HAMK University of Applied Sciences operates across seven campuses in Finland.
+Accommodation options vary by campus — some campuses offer on-campus student
+housing managed directly by HAMK, while others rely on external housing partners
+and private rental markets.
+
+IMPORTANT RULE: You can only apply for student accommodation at the campus where
+you are currently studying. Do not apply for accommodation at a different campus.
+
+The seven campus cities are:
+- Hämeenlinna
+- Riihimäki
+- Forssa
+- Valkeakoski
+- Evo
+- Lepaa
+- Mustiala
+
+Campuses with on-campus HAMK-managed housing: Evo, Lepaa, Mustiala
+Campuses relying on external/city housing partners: Hämeenlinna, Riihimäki,
+Forssa, Valkeakoski
+
+----------------------------------------------------------
+SECTION 2: CAMPUS OVERVIEWS
+----------------------------------------------------------
+
+--- Hämeenlinna Campus ---
+Hämeenlinna is the main HAMK campus. Students can apply for housing through
+the Hämeenlinna Region Student Housing Foundation (HOPS). HOPS offers
+apartments in the Visakylä, Kampuskaarre, and Hattelmala areas. Utilities are
+included in the rent.
+
+Family housing: Hämeenlinnan Asunnot provides family-suitable rental apartments.
+
+Private rental options: Vuokraovi, Oikotie, NAL, Lumo, Joo-kodit.
+
+Note: Applications to HOPS are valid for only 3 months. Do not apply too early.
+
+--- Riihimäki Campus ---
+Students can apply for housing through HOPS, which offers apartments in the
+Peltosaari area with utilities included. Riihimäen Kotikulma provides options
+for both individual students and families.
+
+Private rental options are also available through Vuokraovi and Oikotie.
+
+Note: The same 3-month application validity rule applies as in Hämeenlinna.
+
+--- Forssa Campus ---
+Forssa does not have dedicated student dormitories. Degree students are expected
+to find housing in the private or public rental market.
+
+City-owned option: Forssa Asunnot Oy — available for both individuals and families.
+Private options: Vuokraovi, Oikotie.
+
+--- Valkeakoski Campus ---
+City-owned option: Valkeakoski Asunnot Oy — available for individuals and families.
+Private options: Vuokraovi, Oikotie.
+
+--- Evo Campus ---
+Evo is located in a beautiful lakeside setting surrounded by the forests of the
+Rautjärvi lakes. It is a remote campus with no public transportation available.
+Students living here typically need their own transportation.
+
+HAMK manages on-campus housing at Evo. Only individual students can apply
+(no family accommodation available).
+
+--- Lepaa Campus ---
+Lepaa is a historic campus set in a park-like environment. HAMK manages
+on-campus housing for individual students. Family accommodation is not available.
+
+--- Mustiala Campus ---
+Mustiala is another historic park-campus with a relaxed rural atmosphere.
+Amenities include a gym, a leisure room, and a lakeside sauna. HAMK manages
+on-campus housing for individual students only. Family accommodation is not available.
+
+----------------------------------------------------------
+SECTION 3: ROOM TYPES AND PRICES
+----------------------------------------------------------
+
+All prices listed are per person per month (long-term) or per person per night
+(short-term), unless otherwise noted.
+
+--- EVO CAMPUS ---
+
+Long-term shared apartments (furnished):
+  - Rent: €180 – €275 / month / person
+  - Furnishings included: bed, desk, chair, wardrobe
+  - Shared kitchen and living area with other residents
+
+Long-term studio or one-bedroom apartments:
+  - Rent: €300 – €385 / month / apartment
+  - Fewer furnishings included
+  - More privacy than shared apartments
+
+Short-term accommodation:
+  - Rate: €25 – €35 / night / person
+  - Bedding and kitchen utensils provided
+
+--- LEPAA CAMPUS ---
+
+Long-term shared apartments (furnished):
+  - Rent: €199 – €295 / month / person
+
+Long-term studio or one-bedroom apartments (unfurnished):
+  - Rent: €295 – €560 / month / apartment
+
+Short-term accommodation:
+  - Rate: €30 – €40 / night / person
+  - Note: Guests must bring their own bed linens
+
+--- MUSTIALA CAMPUS ---
+
+Long-term shared apartments (furnished):
+  - Rent: €180 – €340 / month / person
+
+Long-term studio or one-bedroom apartments (unfurnished):
+  - Rent: €337 – €495 / month / apartment
+
+Short-term accommodation:
+  - Rate: €25 – €35 / night / person
+  - Special package: "Cow Shed Week" — 4 nights for €85 (unique Mustiala experience)
+
+--- HÄMEENLINNA / RIIHIMÄKI (via HOPS) ---
+
+Exact prices are set by HOPS and may vary. Utilities are included in rent.
+Contact HOPS directly or visit their website for current pricing.
+
+--- FORSSA / VALKEAKOSKI (via city housing companies) ---
+
+Prices are set by local housing providers (Forssa Asunnot Oy, Valkeakoski
+Asunnot Oy). Contact them directly for current availability and pricing.
+
+----------------------------------------------------------
+SECTION 4: APPLICATION PROCESS
+----------------------------------------------------------
+
+ON-CAMPUS HOUSING (Evo, Lepaa, Mustiala):
+
+1. A single application form covers both short-term and long-term accommodation
+   at each campus.
+2. Submit the application form available on the HAMK accommodation webpage.
+3. Apply only for the campus where you are enrolled as a student.
+4. Wait for confirmation from the campus accommodation coordinator.
+5. Sign the rental agreement and pay any required deposit before arrival.
+
+To terminate or pause your rental agreement:
+  - Use the official form to terminate your agreement.
+  - You can also apply to change your agreement status to "half-rent" temporarily
+    (e.g., during a long internship period or exchange semester).
+
+OFF-CAMPUS HOUSING (Hämeenlinna, Riihimäki, Forssa, Valkeakoski):
+
+1. Contact the relevant housing provider directly (HOPS, city housing company,
+   or private landlord).
+2. Use their website or contact form to apply.
+3. For HOPS: Note that applications are valid for only 3 months — do not apply
+   too early before your intended move-in date.
+4. For private rentals: Search on Vuokraovi.com or Oikotie.fi.
+
+GENERAL TIPS:
+- Start your housing search as early as possible, especially for popular campuses.
+- International students arriving for the first time should contact the
+  accommodation coordinator well in advance of arrival.
+- If you have special needs or accessibility requirements, mention them in your
+  application.
+
+----------------------------------------------------------
+SECTION 5: CONTACT INFORMATION
+----------------------------------------------------------
+
+General accommodation inquiries:
+  Email: arrival@hamk.fi
+  (Use this address for general questions not specific to a single campus)
+
+Campus-specific accommodation coordinators:
+
+  Evo Campus:
+    Email: accommodation.evo@hamk.fi (general contact)
+
+  Lepaa Campus:
+    Email: accommodation.lepaa@hamk.fi (general contact)
+
+  Mustiala Campus:
+    Email: accommodation.mustiala@hamk.fi (general contact)
+
+For off-campus housing partners:
+
+  HOPS (Hämeenlinna & Riihimäki):
+    Website: hops.fi
+    Apply through their website for available apartments.
+
+  Forssa Asunnot Oy:
+    Website: forssakoti.fi
+
+  Valkeakoski Asunnot Oy:
+    Website: valkeakoskiasunnot.fi
+
+Private rental platforms:
+  - Vuokraovi: vuokraovi.com
+  - Oikotie: oikotie.fi
+  - NAL: nal.fi (youth housing)
+  - Lumo: lumo.fi
+  - Joo-kodit: joo-kodit.fi
+
+----------------------------------------------------------
+SECTION 6: FREQUENTLY ASKED QUESTIONS (FAQ)
+----------------------------------------------------------
+
+Q: Can I apply for accommodation at a campus that is not my study campus?
+A: No. HAMK policy requires that you apply for accommodation only at the campus
+   where you are currently enrolled as a student.
+
+Q: Can families with children get accommodation at HAMK campuses?
+A: On-campus housing at Evo, Lepaa, and Mustiala is available for individual
+   students only — families are not accommodated there. For family housing in
+   Hämeenlinna and Riihimäki, contact Hämeenlinnan Asunnot or Riihimäen
+   Kotikulma respectively. Forssa and Valkeakoski also have family-suitable
+   options through their city housing companies.
+
+Q: Are utilities included in the rent?
+A: For HOPS-managed apartments (Hämeenlinna, Riihimäki), utilities are included.
+   For on-campus housing (Evo, Lepaa, Mustiala), check your rental agreement —
+   shared apartments typically include utilities. Studio/one-bedroom units may
+   not include all utilities.
+
+Q: How far in advance should I apply for accommodation?
+A: For HOPS housing, note that applications are only valid for 3 months, so
+   applying too early is not helpful. For on-campus housing at Evo, Lepaa, and
+   Mustiala, it is advisable to apply as soon as you have confirmed your study
+   place, especially for the autumn semester (August start).
+
+Q: Is short-term accommodation available if I arrive before my long-term place
+   is ready?
+A: Yes. Evo, Lepaa, and Mustiala offer short-term (nightly) accommodation.
+   Rates range from €25–€40/night depending on the campus. This is suitable
+   for orientation weeks or while waiting for a long-term contract to begin.
+
+Q: Are the on-campus rooms furnished?
+A: Shared apartments at Evo and Mustiala include basic furniture (bed, desk,
+   chair, wardrobe). Studio and one-bedroom apartments at Lepaa, Mustiala, and
+   Evo are typically unfurnished or have fewer furnishings. Always confirm with
+   the campus coordinator before signing.
+
+Q: What is the "Cow Shed Week" at Mustiala?
+A: Mustiala Campus offers a unique short-term accommodation package called
+   "Cow Shed Week" — 4 nights for €85. It is a distinctive rural experience
+   reflecting Mustiala's agricultural heritage.
+
+Q: How do I cancel or pause my rental agreement?
+A: Use the official termination or half-rent change form available on the HAMK
+   accommodation webpage. A "half-rent" status is possible when you are away
+   for an extended period, such as during an internship or exchange semester.
+
+Q: Is there public transportation near the on-campus housing?
+A: Availability varies significantly. Evo Campus is in a remote forest location
+   with no public transportation — a car is strongly recommended. Lepaa and
+   Mustiala are also in rural settings with limited transport links. Hämeenlinna
+   and Riihimäki have better public transport connections.
+
+Q: Can exchange or visiting students apply for accommodation?
+A: Yes, both degree and exchange students can apply for accommodation. Contact
+   arrival@hamk.fi for guidance on the process as an international or exchange
+   student.
+
+Q: What should I do if I have accessibility or special accommodation needs?
+A: Mention your requirements clearly in your application form or contact the
+   accommodation coordinator at your campus directly via email before applying.
+
+Q: I'm studying in Hämeenlinna. Where exactly are the HOPS apartments located?
+A: HOPS offers apartments in three areas near Hämeenlinna: Visakylä,
+   Kampuskaarre, and Hattelmala. All are close to the main HAMK campus.
+
+Q: Can I find a private rental apartment instead of using HOPS or HAMK housing?
+A: Yes. Private rentals are available through platforms such as Vuokraovi.com,
+   Oikotie.fi, NAL, Lumo, and Joo-kodit. These are especially useful in cities
+   like Forssa and Valkeakoski where dedicated student housing is limited.
+
+----------------------------------------------------------
+END OF KNOWLEDGE BASE
+----------------------------------------------------------
