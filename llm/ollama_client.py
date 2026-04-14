@@ -18,13 +18,15 @@ SYSTEM_PROMPT = """You are a helpful assistant for HAMK University of Applied Sc
 student accommodation queries.
 
 Rules for answering:
-1. Read the Knowledge Base context first. If it clearly answers the question,
+1. If WEATHER DATA is present, use it to answer weather questions directly.
+2. If TRANSPORT DATA is present, use it to answer travel/transport questions directly.
+3. Read the Knowledge Base context next. If it clearly answers the question,
    give that answer and STOP — do not add web results.
-2. Only turn to the WEB SEARCH RESULTS if the Knowledge Base does not contain
-   the answer. When using web results, include counts, URLs, and details.
-3. Never mix KB answers with unrelated web results.
-4. If neither source has the answer, say so and suggest arrival@hamk.fi.
-5. Be concise, friendly, and factual."""
+4. Only turn to WEB SEARCH RESULTS if the Knowledge Base does not have the answer.
+   When using web results, include listing counts, URLs, and details.
+5. Never mix KB answers with unrelated web or weather results.
+6. If no source has the answer, say so and suggest arrival@hamk.fi.
+7. Be concise, friendly, and factual."""
 
 
 def generate_answer(query: str, context: str) -> str:
@@ -45,10 +47,25 @@ def generate_answer(query: str, context: str) -> str:
         requests.exceptions.HTTPError: If the Ollama API returns an error.
     """
     has_web = "===WEB SEARCH RESULTS" in context
+    has_weather = "===WEATHER DATA===" in context
+    has_transport = "===TRANSPORT DATA===" in context
+
+    extra_instructions = []
+    if has_web:
+        extra_instructions.append(
+            "The context contains live WEB SEARCH RESULTS — include listing counts and URLs."
+        )
+    if has_weather:
+        extra_instructions.append(
+            "The context contains live WEATHER DATA — use it to answer weather questions."
+        )
+    if has_transport:
+        extra_instructions.append(
+            "The context contains live TRANSPORT DATA — use it to answer travel questions."
+        )
     web_instruction = (
-        "\nIMPORTANT: The context contains live WEB SEARCH RESULTS. "
-        "Use them to answer — include listing counts and direct URLs where available.\n"
-        if has_web else ""
+        "\nIMPORTANT: " + " ".join(extra_instructions) + "\n"
+        if extra_instructions else ""
     )
     prompt = (
         f"{SYSTEM_PROMPT}\n\n"

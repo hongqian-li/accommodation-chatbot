@@ -18,6 +18,8 @@ from dotenv import load_dotenv
 from privacy_layer.classifier import classify
 from knowledge_base.query import get_context_with_confidence
 from knowledge_base.web_search import search_finnish_housing, web_search
+from knowledge_base.weather import get_weather_for_query
+from knowledge_base.transport import get_transport_for_query
 from llm.ollama_client import generate_answer, is_ollama_running
 
 load_dotenv()
@@ -41,6 +43,17 @@ HOUSING_KEYWORDS = [
     "asunto", "vuokra", "listing", "listings", "oikotie", "vuokraovi", "hops",
 ]
 
+WEATHER_KEYWORDS = [
+    "weather", "temperature", "forecast", "rain", "snow", "cold", "warm",
+    "wind", "climate", "degrees", "celsius",
+]
+
+TRANSPORT_KEYWORDS = [
+    "train", "bus", "timetable", "schedule", "departure", "arriving",
+    "how to get", "getting there", "travel to", "get to", "from helsinki",
+    "from tampere", "from turku", "transport", "journey", "route",
+]
+
 
 def _has_live_intent(message: str) -> bool:
     """Return True if the message signals intent for live/current data."""
@@ -52,6 +65,18 @@ def _is_housing_query(message: str) -> bool:
     """Return True if the query is about finding/renting accommodation."""
     msg = message.lower()
     return any(kw in msg for kw in HOUSING_KEYWORDS)
+
+
+def _is_weather_query(message: str) -> bool:
+    """Return True if the query is about weather at a campus or city."""
+    msg = message.lower()
+    return any(kw in msg for kw in WEATHER_KEYWORDS)
+
+
+def _is_transport_query(message: str) -> bool:
+    """Return True if the query is about getting to a campus or between cities."""
+    msg = message.lower()
+    return any(kw in msg for kw in TRANSPORT_KEYWORDS)
 
 SENSITIVE_RESPONSE = (
     "Your question seems to involve personal or sensitive information. "
@@ -109,8 +134,32 @@ def chat():
 
     web_used = False
     try:
+        # Gather specialised data (weather / transport) before RAG
+        extra_sections = []
+        if _is_weather_query(message):
+            weather = get_weather_for_query(message)
+            if weather:
+                extra_sections.append(
+                    f"===WEATHER DATA===\n{weather}\n===END WEATHER==="
+                )
+        if _is_transport_query(message):
+            transport = get_transport_for_query(message)
+            if transport:
+                extra_sections.append(
+                    f"===TRANSPORT DATA===\n{transport}\n===END TRANSPORT==="
+                )
+
         context, needs_web = get_context_with_confidence(message)
-        if needs_web or _has_live_intent(message):
+
+        if extra_sections:
+            context = "\n\n".join(extra_sections) + "\n\n" + context
+
+        # Skip web search if we already have live weather/transport data
+        # (unless it's also a housing query, where listings are still useful)
+        has_specialized = bool(extra_sections)
+        skip_web = has_specialized and not _is_housing_query(message)
+
+        if not skip_web and (needs_web or _has_live_intent(message)):
             # Use Finnish housing search only for accommodation queries;
             # go straight to general web search for everything else
             if _is_housing_query(message):
