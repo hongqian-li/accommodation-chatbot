@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "hamk-search": {
+      "command": "python",
+      "args": ["E:/cursor/accommodation-chatbot/mcp_server/search_server.py"],
+      "env": {}
+    }
+  }
+}

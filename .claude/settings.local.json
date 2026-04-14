@@ -1,0 +1,16 @@
+{
+  "enableAllProjectMcpServers": true,
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:11434/api/tags)",
+      "Bash(python -m json.tool)",
+      "Bash(cmd:*)",
+      "Bash(find E:/cursor/accommodation-chatbot -type d -name \"__pycache__\" -exec rm -rf {} +)",
+      "Bash(python app.py)",
+      "Bash(curl:*)",
+      "Bash(python -c ':*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)"
+    ]
+  }
+}

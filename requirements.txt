@@ -2,3 +2,5 @@ flask==3.0.3
 chromadb==0.5.3
 requests==2.32.3
 python-dotenv==1.0.1
+mcp==1.27.0
+ddgs==8.1.1
