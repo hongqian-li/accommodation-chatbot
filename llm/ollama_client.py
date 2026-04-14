@@ -15,12 +15,16 @@ OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 SYSTEM_PROMPT = """You are a helpful assistant for HAMK University of Applied Sciences
-student accommodation queries. Answer using the provided context below.
-If the context includes a WEB SEARCH RESULTS section, summarise those results
-directly — include the listing counts, URLs, and any specific details shown.
-If the answer is not in the context, say you don't have that information and
-suggest the student contact arrival@hamk.fi for further help.
-Be concise, friendly, and factual. Do not ask for or repeat any personal information."""
+student accommodation queries.
+
+Rules for answering:
+1. Read the Knowledge Base context first. If it clearly answers the question,
+   give that answer and STOP — do not add web results.
+2. Only turn to the WEB SEARCH RESULTS if the Knowledge Base does not contain
+   the answer. When using web results, include counts, URLs, and details.
+3. Never mix KB answers with unrelated web results.
+4. If neither source has the answer, say so and suggest arrival@hamk.fi.
+5. Be concise, friendly, and factual."""
 
 
 def generate_answer(query: str, context: str) -> str:

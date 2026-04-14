@@ -36,10 +36,22 @@ LIVE_INTENT_KEYWORDS = [
 ]
 
 
+HOUSING_KEYWORDS = [
+    "apartment", "room", "housing", "rent", "rental", "flat", "accommodation",
+    "asunto", "vuokra", "listing", "listings", "oikotie", "vuokraovi", "hops",
+]
+
+
 def _has_live_intent(message: str) -> bool:
     """Return True if the message signals intent for live/current data."""
     msg = message.lower()
     return any(kw in msg for kw in LIVE_INTENT_KEYWORDS)
+
+
+def _is_housing_query(message: str) -> bool:
+    """Return True if the query is about finding/renting accommodation."""
+    msg = message.lower()
+    return any(kw in msg for kw in HOUSING_KEYWORDS)
 
 SENSITIVE_RESPONSE = (
     "Your question seems to involve personal or sensitive information. "
@@ -99,8 +111,12 @@ def chat():
     try:
         context, needs_web = get_context_with_confidence(message)
         if needs_web or _has_live_intent(message):
-            # Try Finnish housing sites first; fall back to general web search
-            web_results = search_finnish_housing(message) or web_search(message)
+            # Use Finnish housing search only for accommodation queries;
+            # go straight to general web search for everything else
+            if _is_housing_query(message):
+                web_results = search_finnish_housing(message) or web_search(message)
+            else:
+                web_results = web_search(message)
             if web_results:
                 context = (
                     context
