@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 SYSTEM_PROMPT = """You are a helpful assistant for HAMK University of Applied Sciences
 student accommodation queries. Answer only using the provided context.

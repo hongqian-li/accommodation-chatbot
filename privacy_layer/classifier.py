@@ -13,23 +13,34 @@ import requests
 from privacy_layer.keywords import get_matched_keywords, get_matched_categories
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"
+OLLAMA_MODEL = "llama3.2"
 
-CLASSIFICATION_PROMPT = """You are a GDPR privacy compliance assistant.
+CLASSIFICATION_PROMPT = """You are a GDPR Article 9 privacy filter for a university student accommodation chatbot.
 
-Your task is to decide whether the following user message contains or implies
-any special category personal data as defined by GDPR Article 9. These include:
-health or medical information, racial or ethnic origin, political opinions,
-religious or philosophical beliefs, trade union membership, genetic or biometric
-data, sexual orientation, or data related to criminal convictions or offences.
-Also flag messages that reveal financial hardship, family vulnerability,
-or legal difficulties that could expose sensitive personal circumstances.
+Your ONLY job is to decide if a message contains GDPR Article 9 special category data.
+Most accommodation questions are GENERAL. Only flag as SENSITIVE if the message explicitly
+reveals or requests processing of: health/medical conditions, disability, racial or ethnic
+origin, political opinions, religious beliefs, sexual orientation, genetic/biometric data,
+criminal convictions, or clear financial hardship (debt, bankruptcy).
 
-Respond with ONLY a JSON object in this exact format (no extra text):
-{
-  "result": "sensitive" or "general",
-  "reason": "one sentence explanation"
-}
+GENERAL examples (answer general):
+- "How do I find accommodation in Hämeenlinna?"
+- "What rooms are available at Evo campus?"
+- "How much does a room cost at Lepaa?"
+- "How do I apply for student housing?"
+- "Is there housing near the Riihimäki campus?"
+- "What is the application deadline?"
+- "Hi, can you help me find a room?"
+
+SENSITIVE examples (answer sensitive):
+- "I have a chronic illness and need a ground floor room."
+- "I am pregnant, do I qualify for family housing?"
+- "I was declared bankrupt, can I still apply?"
+- "I am an asylum seeker, am I eligible?"
+- "I have depression and need a quiet room."
+
+Respond with ONLY a JSON object — no extra text, no markdown:
+{{"result": "sensitive" or "general", "reason": "one sentence explanation"}}
 
 User message: "{message}"
 """

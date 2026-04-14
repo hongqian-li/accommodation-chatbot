@@ -88,17 +88,26 @@ ALL_KEYWORDS: list[str] = [
 ]
 
 
+import re as _re
+
+
+def _keyword_pattern(kw: str) -> _re.Pattern:
+    """Compile a word-boundary regex for a keyword (cached via re module)."""
+    return _re.compile(r"\b" + _re.escape(kw) + r"\b", _re.IGNORECASE)
+
+
 def get_matched_keywords(text: str) -> list[str]:
-    """Return all sensitive keywords found in the given text (case-insensitive)."""
-    text_lower = text.lower()
-    return [kw for kw in ALL_KEYWORDS if kw in text_lower]
+    """
+    Return all sensitive keywords found in the given text (case-insensitive,
+    whole-word matching to avoid false positives like 'ill' inside 'still').
+    """
+    return [kw for kw in ALL_KEYWORDS if _keyword_pattern(kw).search(text)]
 
 
 def get_matched_categories(text: str) -> list[str]:
     """Return the GDPR Art. 9 categories triggered by the given text."""
-    text_lower = text.lower()
     return [
         category
         for category, keywords in SENSITIVE_KEYWORDS.items()
-        if any(kw in text_lower for kw in keywords)
+        if any(_keyword_pattern(kw).search(text) for kw in keywords)
     ]
