@@ -11,6 +11,7 @@ HAMK students — especially incoming international students — often have a lo
 This chatbot tries to solve both problems at once:
 
 - Answer common accommodation questions accurately using a RAG (Retrieval-Augmented Generation) pipeline built on real HAMK accommodation data
+- Fall back to live web search (DuckDuckGo) when the knowledge base does not have a confident answer
 - Detect and block GDPR Article 9 sensitive queries before they ever reach the LLM, redirecting the user to a human contact instead
 
 Everything runs locally — no cloud APIs, no data leaving the machine.
@@ -29,7 +30,7 @@ The result is that this app was built almost entirely through a conversation wit
 
 ## How It Was Built — Agentic AI Workflow
 
-The entire project was built in a single session using **Claude Code** (Anthropic's CLI agent) running inside the **Cursor** IDE. The workflow was purely conversational — no manual file editing, no copy-pasting from Stack Overflow, no writing code independently.
+The entire project was built using **Claude Code** (Anthropic's CLI agent) running inside the **Cursor** IDE. The workflow was purely conversational — no manual file editing, no copy-pasting from Stack Overflow, no writing code independently.
 
 Here is roughly how the session went:
 
@@ -42,8 +43,9 @@ Here is roughly how the session went:
 | 5 | Build a GDPR privacy classifier | Fetched GDPR Article 9 spec online, wrote `privacy_layer/keywords.py` (100+ keywords across 9 categories) and `privacy_layer/classifier.py` (two-stage: keyword scan + LLM fallback) |
 | 6 | Build the Flask backend and chat UI | Wrote `app.py` (full request pipeline) and `templates/index.html` (chat UI with typing indicator, sensitive message highlighting) |
 | 7 | Run the app and debug a false positive | Diagnosed that general queries were being flagged as sensitive — traced it to 3 bugs (wrong model name, substring keyword matching, vague LLM prompt) and fixed all three |
-| 8 | Write test cases | Read screenshots I had taken, wrote 5 structured test cases in `test_cases/test_cases.md` |
-| 9 | Write this README | Here we are |
+| 8 | Add web search fallback + MCP server | Added DuckDuckGo fallback when RAG confidence is low, live intent detection, housing vs non-housing routing, and a FastMCP server so Claude Code can call the same search tools |
+| 9 | Debug and fix two response quality bugs | Fixed sauna query (model was ignoring KB and returning apartment listings) and bus timetable query (model hallucinated a HOPS answer instead of using general web search) |
+| 10 | Write test cases and this README | Documented 13 test cases from screenshots, updated README |
 
 Each step was a short natural-language instruction. Claude Code handled file creation, web fetching, git commits, debugging, and even process management (finding and killing stale Flask processes when multiple instances piled up).
 
@@ -64,14 +66,24 @@ User message
      ▼
 ┌─────────────────────────────┐
 │     RAG Pipeline            │
-│  ChromaDB vector search     │  ──► Top-3 relevant chunks
+│  ChromaDB vector search     │  ──► Top-3 relevant chunks + L2 confidence score
 │  knowledge_base/query.py    │
 └─────────────────────────────┘
+     │
+     ├── Confidence high (avg L2 < 0.95) ──► Answer from KB only
+     │
+     └── Confidence low  (avg L2 ≥ 0.95) ──► Web search fallback
+          │                                    (or live intent detected)
+          ├── Housing query? ──► search_finnish_housing() [Vuokraovi, Oikotie, HOPS]
+          └── Other query?   ──► web_search() [DuckDuckGo general]
+               │
+               ▼
+          Combined context (KB + web results)
      │
      ▼
 ┌─────────────────────────────┐
 │     LLM Answer Generation   │
-│  Ollama (llama3.2, local)   │  ──► Answer grounded in HAMK data
+│  Ollama (llama3.2, local)   │  ──► Answer grounded in HAMK data + live results
 │  llm/ollama_client.py       │
 └─────────────────────────────┘
      │
@@ -87,6 +99,8 @@ User message
 | LLM | Ollama (`llama3.2`, runs locally) |
 | Vector store | ChromaDB (persisted to `./chroma_db`) |
 | Privacy classification | Keyword regex + Ollama LLM |
+| Web search | DuckDuckGo via `ddgs` |
+| MCP server | FastMCP (stdio transport) |
 | Frontend | Plain HTML/CSS/JS (single page, served by Flask) |
 | Knowledge base | Custom `.txt` file based on `hamk.fi` accommodation content |
 
@@ -99,9 +113,11 @@ accommodation-chatbot/
 ├── app.py                        # Flask entry point — full request pipeline
 ├── requirements.txt
 ├── CLAUDE.md                     # Project context file for the AI agent
+├── .mcp.json                     # MCP server registration for Claude Code
 ├── knowledge_base/
 │   ├── ingest.py                 # Chunk, embed, and store docs in ChromaDB
-│   ├── query.py                  # Retrieve top-3 relevant chunks
+│   ├── query.py                  # Retrieve top-3 chunks + confidence score
+│   ├── web_search.py             # DuckDuckGo search (general + Finnish housing)
 │   └── data/
 │       └── hamk_accommodation.txt  # HAMK accommodation knowledge base
 ├── privacy_layer/
@@ -109,11 +125,13 @@ accommodation-chatbot/
 │   └── classifier.py             # Two-stage privacy classifier
 ├── llm/
 │   └── ollama_client.py          # Ollama API wrapper
+├── mcp_server/
+│   └── search_server.py          # FastMCP server exposing web_search + search_finnish_housing
 ├── templates/
 │   └── index.html                # Chat UI
 ├── test_cases/
-│   └── test_cases.md             # 5 documented manual test cases
-└── test_cases_screenshots/       # UI screenshots from test session
+│   └── test_cases.md             # 13 documented manual test cases
+└── test_cases_screenshots/       # UI screenshots from test sessions
 ```
 
 ---
@@ -156,6 +174,9 @@ Having a project context file that the agent reads at the start of each session 
 **Debugging is still a human job.**
 The false-positive bug (general queries flagged as sensitive) required real diagnosis: checking which stage fired, reading Ollama API responses, tracing a substring match back to `"ill"` hiding inside `"still"`. The agent helped fix each individual issue once identified, but identifying them required understanding the system.
 
+**Screenshots are better bug reports than words.**
+Two of the bugs found in testing came from sharing screenshots of the chat UI. Seeing the actual response ("Check the HOPS website for bus timetables") made the problem unambiguous in a way that a verbal description would not.
+
 **Background processes pile up silently.**
 When running a Flask app through an AI-managed session, each restart attempt spawned a new process without killing the old one. Six stale Flask instances were running simultaneously before we caught it. Not a Claude Code problem specifically — just a lesson about stateful side effects in agentic workflows.
 
@@ -170,6 +191,17 @@ A vague prompt ("flag GDPR Article 9 data") caused the LLM to over-flag everythi
 **Fail safe, not fail open.**
 When the LLM is unavailable or returns something unexpected, the system defaults to `"sensitive"`. This is the right call for a privacy-critical layer — it is better to send one extra email than to accidentally process protected data.
 
+### On RAG and web search
+
+**Distance scores are a blunt instrument.**
+Using avg L2 distance > 0.95 to trigger web search works well on average, but individual queries can have unexpectedly high distances even when the KB has the answer (the Mustiala sauna query scored 1.203 despite the KB mentioning the sauna). The system prompt — instructing the model to always prefer KB answers when available — is an important second line of defence.
+
+**Search routing matters.**
+A single web search function is not enough. Finnish housing queries need site-specific searches (Vuokraovi, Oikotie, HOPS); transport queries need general search. Mixing them produces wrong answers. Routing by query type before calling search is simple but important.
+
+**Live intent is a separate signal from RAG confidence.**
+A query like "Can you search Vuokraovi for me?" has *low* RAG distance (the KB mentions Vuokraovi) but the user clearly wants live data, not a static description. Live intent keywords ("find me", "can you search", "available now") must be detected independently of distance scoring.
+
 ### On using a thesis topic as a learning project
 
 Using real domain knowledge as the foundation made the project more grounded and more honest. The knowledge base content, the privacy rules, and the test cases all came from months of thesis research — the AI just helped build the delivery mechanism around that knowledge. That felt like the right division of responsibility.
@@ -178,15 +210,23 @@ Using real domain knowledge as the foundation made the project more grounded and
 
 ## Test Results
 
-5 manual test cases documented in `test_cases/test_cases.md` — all passing.
+13 manual test cases documented in `test_cases/test_cases.md` — all passing.
 
-| TC | Query | Expected | Result |
-|---|---|---|---|
-| TC-01 | "Hi, can you help me find a room?" | General answer | PASS |
-| TC-02 | "How do I find accommodation in Hämeenlinna?" | General answer | PASS |
-| TC-03 | "I have a chronic illness and need a ground floor room." | Sensitive redirect | PASS |
-| TC-04 | "I am pregnant, do I qualify for family housing?" | Sensitive redirect | PASS |
-| TC-05 | "Is there housing near the Riihimäki campus?" | General answer | PASS |
+| TC | Query | Type | Web Search | Result |
+|---|---|---|---|---|
+| TC-01 | "Hi, can you help me find a room?" | General | No | PASS |
+| TC-02 | "How do I find accommodation in Hämeenlinna?" | General | No | PASS |
+| TC-03 | "I have a chronic illness and need a ground floor room." | Sensitive | No | PASS |
+| TC-04 | "I am pregnant, do I qualify for family housing?" | Sensitive | No | PASS |
+| TC-05 | "Is there housing near the Riihimäki campus?" | General | No | PASS |
+| TC-06 | "Can you search Hämeenlinna apartments on Vuokraovi for me?" | General | Yes (live intent) | PASS |
+| TC-07 | "Find me a room near Riihimäki campus" | General | Yes (live intent) | PASS |
+| TC-08 | "I am a single student. Can I apply HOPS Riihimäki?" | General | No | PASS |
+| TC-09 | "Search for accessible apartments for someone with a disability" | Sensitive | No | PASS |
+| TC-10 | "Find me family housing, I am pregnant" | Sensitive | No | PASS |
+| TC-11 | "What is the application process for HOPS apartments?" | General | No | PASS |
+| TC-12 | "Does Mustiala have a sauna?" *(regression)* | General | Yes | PASS |
+| TC-13 | "What is the bus timetable from Hämeenlinna to Helsinki?" *(regression)* | General | Yes | PASS |
 
 ---
 
